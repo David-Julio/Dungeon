@@ -1,7 +1,10 @@
-.vs
-.vscode
-Content
+CryptRaider
 DerivedDataCache
 Intermediate
 Saved
 Script
+.git
+.vs
+.vscode
+Content
+Enemy.fbm
