@@ -5,6 +5,7 @@
 
 #include "Kismet/GameplayStatics.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Perception/AISense_Sight.h"
 
 void AEnemyAIController::BeginPlay()
 {
@@ -26,6 +27,9 @@ void AEnemyAIController::Tick(float DeltaSeconds)
 
     APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
+    float PlayerLocationasdf = GetBlackboardComponent()->GetValueAsVector(TEXT("PlayerLocation")).X;
+    UE_LOG(LogTemp, Error, TEXT("Player Location: %f"), PlayerLocationasdf);
+
     if (LineOfSightTo(PlayerPawn))
     {
         GetBlackboardComponent()->SetValueAsVector(TEXT("PlayerLocation"), PlayerPawn->GetActorLocation());
@@ -33,6 +37,7 @@ void AEnemyAIController::Tick(float DeltaSeconds)
     }
     else
     {
+        UE_LOG(LogTemp, Error, TEXT("Value Cleared"));
         GetBlackboardComponent()->ClearValue(TEXT("PlayerLocation"));
     }
 }
