@@ -6,9 +6,8 @@
 #include "AIController.h"
 #include "EnemyAIController.generated.h"
 
-/**
- * 
- */
+class AWeapon;
+
 UCLASS()
 class CRYPTRAIDER_API AEnemyAIController : public AAIController
 {
@@ -16,6 +15,7 @@ class CRYPTRAIDER_API AEnemyAIController : public AAIController
 
 public:
 	virtual void Tick(float DeltaSeconds);
+	void Attack();
 
 protected:
 	virtual void BeginPlay();
@@ -23,4 +23,20 @@ protected:
 private:
 	UPROPERTY(EditAnywhere, Category = "AI")
 	class UBehaviorTree* AIBehavior;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<AWeapon> WeaponClass;
+
+	UPROPERTY()
+	AWeapon* Axe;
+
+	UPROPERTY(EditAnywhere)
+	UAnimSequence* MyAnimSequence;
+
+/*
+	UPROPERTY(BlueprintReadOnly, EditAnywhere, Category = "Anims")
+ 	class UBlendSpace1D* BlendSpace;
+*/
+	UPROPERTY(EditAnywhere)
+	class UAnimationAsset* SwingAnimation;
 };
