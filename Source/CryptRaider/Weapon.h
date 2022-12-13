@@ -23,14 +23,17 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	void Attacked();
+	void Attacked(bool IntentionToHit);
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	USceneComponent* Root;
 
+	//UPROPERTY(VisibleAnywhere)
+	//UStaticMeshComponent* Mesh;
+	
 	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* Mesh;
+	class USkeletalMeshComponent* SkeletalMesh;
 
 	bool IsHitting = false;
 
@@ -38,5 +41,8 @@ private:
 
 	TArray<AActor*> OverlappingActorsArray;
 
-	void AcceptableCollisionDetected();
+	void AcceptableCollisionDetected(AActor* ActorHit);
+
+	UPROPERTY(EditAnywhere)
+	float Damage = 25.f;
 };

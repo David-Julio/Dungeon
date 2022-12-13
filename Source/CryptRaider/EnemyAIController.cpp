@@ -9,6 +9,7 @@
 #include "Weapon.h"
 #include "GameFramework/Character.h"
 #include "Animation/SkeletalMeshActor.h"
+#include "TimerManager.h"
 
 void AEnemyAIController::BeginPlay()
 {
@@ -18,7 +19,6 @@ void AEnemyAIController::BeginPlay()
     {
         RunBehaviorTree(AIBehavior);
     }
-    
 
     APawn* PlayerPawn = UGameplayStatics::GetPlayerPawn(GetWorld(), 0);
 
@@ -69,52 +69,35 @@ void AEnemyAIController::Tick(float DeltaSeconds)
     }
 }
 
-void AEnemyAIController::Attack()
+void AEnemyAIController::Attack(bool IntentionToHit)
 {
-    //UE_LOG(LogTemp, Display, TEXT("%s"), *GetPawn()->GetActorNameOrLabel());
-
-    /*
     USkeletalMeshComponent* Mesh = GetPawn()->FindComponentByClass<USkeletalMeshComponent>();
 
-    
-    if (Mesh != nullptr)
+    if (SwingAnimation && IntentionToHit)
     {
-        UAnimInstance* AnimInst = Mesh->GetAnimInstance();
-        if (AnimInst != nullptr)
-        {
-            if (MyAnimSequence != nullptr)
-            {
-                UE_LOG(LogTemp, Display, TEXT("throw"));
-                AnimInst->PlaySlotAnimationAsDynamicMontage(MyAnimSequence, TEXT("Enemy_Swiping"), 0.1f, 0.1f, 1.0f, 30.0f);
-            }
-        }
-    }*/
-
-    /*
-    ASkeletalMeshActor *Skel = Cast<ASkeletalMeshActor>(GetPawn());
-    if (Skel)
-    {
-        USkeletalMeshComponent *Mesh = Skel->GetSkeletalMeshComponent();
-        if (Mesh)
-        {
-            Mesh->PlayAnimation(BlendSpace, true);
-            FVector BlendParams(50.0f, 0.0f, 0.0f);
-            Mesh->GetSingleNodeInstance()->SetBlendSpaceInput(BlendParams);
-        }
-
-    }*/
-
-    USkeletalMeshComponent* Mesh = GetPawn()->FindComponentByClass<USkeletalMeshComponent>();
-
-    if (SwingAnimation)
-    {
-        
-
         Mesh->PlayAnimation(SwingAnimation, false);
         Mesh->IsPlaying();
         Mesh->GetAnimationMode();
-
     }
 
-    Axe->Attacked();
+    Axe->Attacked(IntentionToHit);
+}
+
+void AEnemyAIController::BeingAttacked()
+{
+    UE_LOG(LogTemp, Warning, TEXT("set to true"));
+
+    GetBlackboardComponent()->SetValueAsBool(TEXT("HasBeenAttacked"), true);
+
+    FTimerHandle UnusedHandle;
+    GetWorldTimerManager().SetTimer(UnusedHandle, this, &AEnemyAIController::SetBeingHitToFalse, 5.0f, false);
+}
+
+void AEnemyAIController::SetBeingHitToFalse()
+{
+    UE_LOG(LogTemp, Warning, TEXT("set to false"));
+    if (GetBlackboardComponent()->GetValueAsBool(TEXT("HasBeenAttacked")))
+    {
+        GetBlackboardComponent()->SetValueAsBool(TEXT("HasBeenAttacked"), false);
+    }
 }

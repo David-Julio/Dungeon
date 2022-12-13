@@ -15,7 +15,8 @@ class CRYPTRAIDER_API AEnemyAIController : public AAIController
 
 public:
 	virtual void Tick(float DeltaSeconds);
-	void Attack();
+	void Attack(bool IntentionToHit);
+	void BeingAttacked();
 
 protected:
 	virtual void BeginPlay();
@@ -39,4 +40,6 @@ private:
 */
 	UPROPERTY(EditAnywhere)
 	class UAnimationAsset* SwingAnimation;
+
+	void SetBeingHitToFalse();
 };

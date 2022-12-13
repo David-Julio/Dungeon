@@ -1,8 +1,11 @@
-.git
-.vscode
-Content
+CryptRaider
 DerivedDataCache
-Enemy.fbm
 Intermediate
 Saved
-Test
+Script
+.git
+Content
+Enemy.fbm
+.vscode
+.vs
+Import

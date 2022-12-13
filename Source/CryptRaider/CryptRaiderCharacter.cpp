@@ -7,6 +7,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
+#include "Gun.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -42,6 +43,19 @@ void ACryptRaiderCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
+	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GripPoint"));
+	Gun->SetOwner(this);
+}
+
+void ACryptRaiderCharacter::Tick(float DeltaSeconds)
+{
+    Super::Tick(DeltaSeconds);
+
+	if (Mesh1P->GetAnimationMode() == EAnimationMode::AnimationSingleNode && !Mesh1P->IsPlaying())
+    {
+        Mesh1P->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////// Input
@@ -72,6 +86,8 @@ void ACryptRaiderCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("Look Up / Down Mouse", this, &APawn::AddControllerPitchInput);
 	PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &ACryptRaiderCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &ACryptRaiderCharacter::LookUpAtRate);
+
+	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &ACryptRaiderCharacter::Shoot);
 }
 
 void ACryptRaiderCharacter::OnPrimaryAction()
@@ -146,4 +162,16 @@ bool ACryptRaiderCharacter::EnableTouchscreenMovement(class UInputComponent* Pla
 	}
 	
 	return false;
+}
+
+void ACryptRaiderCharacter::Shoot()
+{
+	Gun->PullTrigger();
+	
+    if (ShootAnimation)
+    {
+        Mesh1P->PlayAnimation(ShootAnimation, false);
+        Mesh1P->IsPlaying();
+        Mesh1P->GetAnimationMode();
+    }
 }
