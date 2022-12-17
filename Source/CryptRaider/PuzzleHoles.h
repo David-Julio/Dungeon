@@ -23,14 +23,24 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	TArray<AActor*> CheckIfActorsAreAcceptable(TArray<AActor*> OverlappingActors);
+	void CheckIfActorsAreAcceptable(TArray<AActor*> OverlappingActors);
 	void AcceptableActorTriggered();
 	
 private:
 	int AmountInHole = 0;
 
 	UPROPERTY(EditAnywhere)
-	FString AcceptableTag;
+	FName AcceptableActorTag = "Puzzle1";
 
+	//TArray<AActor*> AcceptableActorsArray;
 
+	AActor* AcceptableActorRef;
+
+	void UpdateArray(AActor* AcceptableActor);
+
+	TArray<AActor*> AllPuzzle1Doors;
+
+	AActor* Puzzle1Manager;
+
+	class UPuzzle1ManagerComponent* Puzzle1ManagerComp;
 };

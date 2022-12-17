@@ -36,10 +36,9 @@ void UHealthComponent::DamageTaken(AActor* DamagedActor, float Damage, const UDa
 	}
 	UE_LOG(LogTemp, Warning, TEXT("Damage Taken in health component"));
 
-
-	if (GEngine)
+	if (HitCameraShakeClass)
 	{
-     	GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, FString::Printf(TEXT("Player Health: %f"), Health));
+		GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
 	}
 }
 

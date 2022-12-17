@@ -7,7 +7,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Components/InputComponent.h"
 #include "GameFramework/InputSettings.h"
+#include "Kismet/GameplayStatics.h"
 #include "Gun.h"
+#include "Puzzle2Gate.h"
 
 
 //////////////////////////////////////////////////////////////////////////
@@ -35,7 +37,6 @@ ACryptRaiderCharacter::ACryptRaiderCharacter()
 	Mesh1P->CastShadow = false;
 	Mesh1P->SetRelativeRotation(FRotator(1.9f, -19.19f, 5.2f));
 	Mesh1P->SetRelativeLocation(FVector(-0.5f, -4.4f, -155.7f));
-
 }
 
 void ACryptRaiderCharacter::BeginPlay()
@@ -43,9 +44,23 @@ void ACryptRaiderCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
+	// Gun setup
 	Gun = GetWorld()->SpawnActor<AGun>(GunClass);
 	Gun->AttachToComponent(Mesh1P, FAttachmentTransformRules::KeepRelativeTransform, TEXT("GripPoint"));
 	Gun->SetOwner(this);
+
+	// temp puzzle 2 setup -- not yet optimised
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Puzzle2"), Puzzle2ActorsArray);
+	if (Puzzle2ActorsArray.Num() > 0)
+	{
+		Puzzle2Actor = Puzzle2ActorsArray[0];
+		MoverActor = Cast<APuzzle2Gate>(Puzzle2Actor);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No actor with 'Puzzle2' tag"));
+	}
+
 }
 
 void ACryptRaiderCharacter::Tick(float DeltaSeconds)
@@ -87,7 +102,12 @@ void ACryptRaiderCharacter::SetupPlayerInputComponent(class UInputComponent* Pla
 	PlayerInputComponent->BindAxis("Turn Right / Left Gamepad", this, &ACryptRaiderCharacter::TurnAtRate);
 	PlayerInputComponent->BindAxis("Look Up / Down Gamepad", this, &ACryptRaiderCharacter::LookUpAtRate);
 
+	// Bind shooting events
 	PlayerInputComponent->BindAction(TEXT("Shoot"), EInputEvent::IE_Pressed, this, &ACryptRaiderCharacter::Shoot);
+
+	// Bind interact events
+	PlayerInputComponent->BindAction(TEXT("Interact"), EInputEvent::IE_Repeat, this, &ACryptRaiderCharacter::Interact);
+	PlayerInputComponent->BindAction(TEXT("Interact"), EInputEvent::IE_Released, this, &ACryptRaiderCharacter::InteractRelease);
 }
 
 void ACryptRaiderCharacter::OnPrimaryAction()
@@ -173,5 +193,54 @@ void ACryptRaiderCharacter::Shoot()
         Mesh1P->PlayAnimation(ShootAnimation, false);
         Mesh1P->IsPlaying();
         Mesh1P->GetAnimationMode();
+		if (HitCameraShakeClass)
+		{
+			GetWorld()->GetFirstPlayerController()->ClientStartCameraShake(HitCameraShakeClass);
+		}
     }
+}
+
+void ACryptRaiderCharacter::Interact()
+{
+	FVector Location;
+	FRotator Rotation;
+	UGameplayStatics::GetPlayerController(GetWorld(), 0)->GetPlayerViewPoint(Location, Rotation);
+	
+
+	FVector End = Location + Rotation.Vector() * MaxRange;
+
+	FHitResult Hit;
+	bool bSuccess = GetWorld()->LineTraceSingleByChannel(Hit, Location, End, ECollisionChannel::ECC_GameTraceChannel4);
+
+	if (Puzzle2Actor != nullptr && bSuccess)
+	{
+		if (MoverActor != nullptr)
+		{
+			MoverActor->SetShouldMoveInMoverComponent(true);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("MoverActor Not pointing to anything"));
+		}
+	}
+	else if (!bSuccess)
+	{
+		MoverActor->SetShouldMoveInMoverComponent(false);
+	}
+}
+
+void ACryptRaiderCharacter::InteractRelease()
+{
+	if (Puzzle2Actor != nullptr)
+	{
+		MoverActor = Cast<APuzzle2Gate>(Puzzle2Actor);
+		if (MoverActor != nullptr)
+		{
+			MoverActor->SetShouldMoveInMoverComponent(false);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("MoverActor Not pointing to anything"));
+		}
+	}
 }

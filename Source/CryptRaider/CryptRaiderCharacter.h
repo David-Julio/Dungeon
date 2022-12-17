@@ -111,8 +111,25 @@ private:
 
 	void Shoot();
 
+	void Interact();
+	void InteractRelease();
+
+	// Max range for interact
+	UPROPERTY (EditAnywhere)
+	float MaxRange = 1000;
+
 	UPROPERTY(EditAnywhere)
 	class UAnimationAsset* ShootAnimation;
 
+	// temp puzzle 2 setup -- not yet optimised
+	TArray<AActor*> Puzzle2ActorsArray;
+
+	//class UMover* MoverComponent;
+
+	AActor* Puzzle2Actor;
+	class APuzzle2Gate* MoverActor; 
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class UCameraShakeBase> HitCameraShakeClass;
 };
 

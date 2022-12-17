@@ -41,5 +41,8 @@ private:
 	UPROPERTY(EditAnywhere)
 	class UAnimationAsset* SwingAnimation;
 
+	UPROPERTY(EditAnywhere)
+	class UAnimationAsset* DownAnimation;
+
 	void SetBeingHitToFalse();
 };

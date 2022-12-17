@@ -3,6 +3,7 @@
 
 #include "Mover.h"
 #include "Math/UnrealMathUtility.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values for this component's properties
 UMover::UMover()
@@ -21,7 +22,8 @@ void UMover::BeginPlay()
 	Super::BeginPlay();
 
 	OriginalLocation = GetOwner()->GetActorLocation();
-	
+
+
 }
 
 
@@ -32,14 +34,29 @@ void UMover::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponent
 
 	FVector TargetLocation = OriginalLocation;
 	
+	UE_LOG(LogTemp, Warning, TEXT("1"));
 	if (ShouldMove)
 	{
+		/*
+		GetOwner()->GetOverlappingActors(OverlappingActorArray);
+		UE_LOG(LogTemp, Warning, TEXT("2"));
+		for (AActor* Actor : OverlappingActorArray)
+		{
+			bool HasAcceptableActorTag = Actor->ActorHasTag("Gate1");
+
+			if (HasAcceptableActorTag)
+			{
+				//return Actor;
+			}
+		}*/
+		//GetOwner()->IsOverlappingActor()
 		TargetLocation = OriginalLocation + MoveOffset;
 	}
 	FVector CurrentLocation = GetOwner()->GetActorLocation();
 	float Speed = MoveOffset.Length() / MoveTime;
 	
 	FVector NewLocation = FMath::VInterpConstantTo(CurrentLocation, TargetLocation, DeltaTime, Speed);
+	UE_LOG(LogTemp, Error, TEXT("%d"), NewLocation.Z);
 	GetOwner()->SetActorLocation(NewLocation);
 }
 

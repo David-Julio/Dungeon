@@ -36,4 +36,7 @@ private:
 	FVector OriginalLocation;
 
 	bool ShouldMove = false;
+
+	TArray<AActor*> OverlappingActorArray;
+	AActor* GateActor;
 };

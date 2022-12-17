@@ -13,18 +13,24 @@ UPuzzleTriggerComponent::UPuzzleTriggerComponent()
 	// ...
 }
 
-AActor* UPuzzleTriggerComponent::GetTriggeringActors()
+void UPuzzleTriggerComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
-    TArray<AActor*> Actors;
+    Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+    
+    GetTriggeringActors();
+}
+
+void UPuzzleTriggerComponent::GetTriggeringActors()
+{
     GetOverlappingActors(Actors);
 
-    //APuzzleHoles PuzzleHolesReference = Cast<APuzzleHoles> ();
-    GetOwner();
-    /*
-    if ()
-    {
+    APuzzleHoles* PuzzleHolesReference = Cast<APuzzleHoles> (GetOwner());
 
-    }*/
+    if (PuzzleHolesReference)
+    {
+        //UE_LOG(LogTemp, Warning, TEXT("1"));
+        PuzzleHolesReference->CheckIfActorsAreAcceptable(Actors);
+    }
 
     for (AActor* Actor : Actors)
     {
@@ -32,9 +38,9 @@ AActor* UPuzzleTriggerComponent::GetTriggeringActors()
 
         if (HasAcceptableActorTag)
         {
-            return Actor;
+            //return Actor;
         }
     }
 
-    return nullptr;
+    //return nullptr;
 }

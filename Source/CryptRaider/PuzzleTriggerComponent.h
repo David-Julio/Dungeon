@@ -9,14 +9,18 @@
 /**
  * 
  */
-UCLASS()
+UCLASS( ClassGroup=(Custom), meta=(BlueprintSpawnableComponent) )
 class CRYPTRAIDER_API UPuzzleTriggerComponent : public UBoxComponent
 {
 	GENERATED_BODY()
 public:
 	// Sets default values for this component's properties
 	UPuzzleTriggerComponent();
+	virtual void TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction) override;
+
 	
 private:
-	AActor* GetTriggeringActors();
+	void GetTriggeringActors();
+
+    TArray<AActor*> Actors;
 };

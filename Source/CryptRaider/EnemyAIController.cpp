@@ -85,8 +85,16 @@ void AEnemyAIController::Attack(bool IntentionToHit)
 
 void AEnemyAIController::BeingAttacked()
 {
-    UE_LOG(LogTemp, Warning, TEXT("set to true"));
+    UE_LOG(LogTemp, Error, TEXT("set to true"));
 
+    USkeletalMeshComponent* Mesh = GetPawn()->FindComponentByClass<USkeletalMeshComponent>();
+
+    if (Mesh->GetAnimationMode() == EAnimationMode::AnimationBlueprint)
+    {
+        Mesh->SetAnimationMode(EAnimationMode::AnimationSingleNode);
+        Mesh->PlayAnimation(DownAnimation, false);
+    }
+    //Mesh->PlayAnimation(DownAnimation, false);
     GetBlackboardComponent()->SetValueAsBool(TEXT("HasBeenAttacked"), true);
 
     FTimerHandle UnusedHandle;

@@ -2,6 +2,8 @@
 
 
 #include "PuzzleHoles.h"
+#include "Puzzle1ManagerComponent.h"
+#include "Kismet/GameplayStatics.h"
 
 // Sets default values
 APuzzleHoles::APuzzleHoles()
@@ -15,7 +17,11 @@ APuzzleHoles::APuzzleHoles()
 void APuzzleHoles::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	UGameplayStatics::GetAllActorsWithTag(GetWorld(), TEXT("Puzzle1Door"), AllPuzzle1Doors);
+	Puzzle1Manager = AllPuzzle1Doors[0];
+
+	Puzzle1ManagerComp = Puzzle1Manager->FindComponentByClass<UPuzzle1ManagerComponent>();
 }
 
 // Called every frame
@@ -23,11 +29,25 @@ void APuzzleHoles::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (AcceptableActorRef)
+	{
+		UpdateArray(AcceptableActorRef);
+	}
 }
 
-TArray<AActor*> APuzzleHoles::CheckIfActorsAreAcceptable(TArray<AActor*> OverlappingActors)
+void APuzzleHoles::CheckIfActorsAreAcceptable(TArray<AActor*> OverlappingActors)
 {
-	
+
+	for (AActor* Actor : OverlappingActors)
+    {
+        bool HasAcceptableActorTag = Actor->ActorHasTag(AcceptableActorTag);
+		
+        if (HasAcceptableActorTag && !Puzzle1ManagerComp->AcceptableBallsInHoles.Contains(Actor))
+        {
+			AcceptableActorRef = Actor;
+        }
+		
+    }
 }
 
 void APuzzleHoles::AcceptableActorTriggered()
@@ -35,3 +55,16 @@ void APuzzleHoles::AcceptableActorTriggered()
 	AmountInHole += 1;
 }
 
+void APuzzleHoles::UpdateArray(AActor* AcceptableActor)
+{
+	if (!Puzzle1ManagerComp->AcceptableBallsInHoles.Contains(AcceptableActor))
+	{		
+		Puzzle1ManagerComp->AcceptableBallsInHoles.Add(AcceptableActor);
+	}
+	if (Puzzle1ManagerComp->AcceptableBallsInHoles.Contains(AcceptableActor) && !IsOverlappingActor(AcceptableActor))
+	{
+		Puzzle1ManagerComp->AcceptableBallsInHoles.Remove(AcceptableActor);
+		AcceptableActor = nullptr;
+	}
+
+}
